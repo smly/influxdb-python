@@ -111,7 +111,7 @@ class InfluxDBClient(object):
                 self._password))
 
         if response.status_code == 200:
-            return True
+            return json.loads(response.content)
         else:
             raise Exception(response.content)
 

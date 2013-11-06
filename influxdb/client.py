@@ -18,9 +18,9 @@ class InfluxDBClient(object):
         self._database = database
         self._baseurl = "http://{0}:{1}".format(self._host, self._port)
 
-        self._headers = json.dumps({
+        self._headers = {
             'Content-type': 'application/json',
-            'Accept': 'text/plain'})
+            'Accept': 'text/plain'}
 
     # Change member variables
 

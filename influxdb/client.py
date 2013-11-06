@@ -68,7 +68,7 @@ class InfluxDBClient(object):
             data=json.dumps({'name': database}),
             headers=self._headers)
 
-        if response.status_code == 200:
+        if response.status_code == 201:
             return True
         else:
             raise Exception(response.content)

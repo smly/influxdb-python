@@ -88,7 +88,7 @@ class InfluxDBClient(object):
             self._username,
             self._password))
 
-        if response.status_code == 200:
+        if response.status_code == 201:
             return True
         else:
             raise Exception(response.content)

@@ -335,7 +335,7 @@ class InfluxDBClient(object):
                 username,
                 self._username,
                 self._password))
-        if response.status_code == 204:
+        if response.status_code == 200:
             return True
         else:
             raise Exception(
@@ -352,7 +352,7 @@ class InfluxDBClient(object):
                 username,
                 self._username,
                 self._password))
-        if response.status_code == 204:
+        if response.status_code == 200:
             return True
         else:
             raise Exception(
@@ -541,6 +541,8 @@ class InfluxDBClient(object):
                 "{0}: {1}".format(response.status_code, response.content))
 
 #    # update the user by POSTing to db/site_dev/users/paul
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
 #
 #    def update_permission(self, json_body):
 #        """

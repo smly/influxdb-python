@@ -144,9 +144,10 @@ class InfluxDBClient(object):
         else:
             chunked_param = 'false'
 
-        encoded_query = urllib.urlencode(query)
+        encoded_query = urllib.urlencode({
+            'q': query})
 
-        url_format = "{0}/db/{1}/series?q={2}&u={3}&p={4}"
+        url_format = "{0}/db/{1}/series?{2}&u={3}&p={4}"
         url_format += "&time_precision={5}&chunked={6}"
 
         response = requests.get(url_format.format(

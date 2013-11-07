@@ -14,14 +14,14 @@ def _build_response_object(status_code=200, content=""):
 
 
 class TestInfluxDBClient(object):
-    def test_switch_database(self):
+    def test_switch_db(self):
         cli = InfluxDBClient('host', 8086, 'username', 'password', 'database')
-        cli.switch_database('another_database')
+        cli.switch_db('another_database')
         assert cli._database == 'another_database'
 
-    def test_switch_username(self):
+    def test_switch_user(self):
         cli = InfluxDBClient('host', 8086, 'username', 'password', 'database')
-        cli.switch_username('another_username', 'another_password')
+        cli.switch_user('another_username', 'another_password')
         assert cli._username == 'another_username'
         assert cli._password == 'another_password'
 

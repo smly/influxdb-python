@@ -4,6 +4,7 @@ python client for influxdb
 """
 import requests
 import json
+import urllib
 
 
 class InfluxDBClient(object):
@@ -24,7 +25,7 @@ class InfluxDBClient(object):
 
     # Change member variables
 
-    def switch_database(self, database):
+    def switch_db(self, database):
         """
         Change client database
 
@@ -34,7 +35,7 @@ class InfluxDBClient(object):
         """
         self._database = database
 
-    def switch_username(self, username, password):
+    def switch_user(self, username, password):
         """
         Change client username
 
@@ -75,10 +76,11 @@ class InfluxDBClient(object):
         Write to multiple time series names
         """
         if time_precision not in ['s', 'm', 'u']:
-            raise Exception("Invalid time precision is given.")
+            raise Exception("Invalid time precision is given. (use 's','m' or 'u')")
 
-        response = requests.post(
-            "{0}/db/{1}/series?u={2}&p={3}&time_precision={4}".format(
+        url_format = "{0}/db/{1}/series?u={2}&p={3}&time_precision={4}"
+
+        response = requests.post(url_format.format(
                 self._baseurl,
                 self._database,
                 self._username,
@@ -130,11 +132,36 @@ class InfluxDBClient(object):
     # Querying Data
     #
     # GET db/:name/series. It takes five parameters
-    def query(self, query, time_precision, chunked=False):
+    def query(self, query, time_precision='s', chunked=False):
         """
-        TODO: Quering data
+        Quering data
         """
-        raise NotImplemented()
+        if time_precision not in ['s', 'm', 'u']:
+            raise Exception("Invalid time precision is given. (use 's','m' or 'u')")
+
+        if chunked is True:
+            chunked_param = 'true'
+        else:
+            chunked_param = 'false'
+
+        encoded_query = urllib.urlencode(query)
+
+        url_format = "{0}/db/{1}/series?q={2}&u={3}&p={4}"
+        url_format += "&time_precision={5}&chunked={6}"
+
+        response = requests.get(url_format.format(
+            self._baseurl,
+            self._database,
+            encoded_query,
+            self._username,
+            self._password,
+            time_precision,
+            chunked_param))
+
+        if response.status_code == 200:
+            return response.content
+        else:
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     # Creating and Dropping Databases
     #

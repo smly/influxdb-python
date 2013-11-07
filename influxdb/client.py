@@ -2,16 +2,21 @@
 """
 python client for influxdb
 """
-import requests
 import json
 import urllib
+
+import requests
 
 
 class InfluxDBClient(object):
     """
     InfluxDB Client
     """
+
     def __init__(self, host, port, username, password, database):
+        """
+        Initialize client
+        """
         self._host = host
         self._port = port
         self._username = username
@@ -72,7 +77,7 @@ class InfluxDBClient(object):
             raise Exception(
                 "{0}: {1}".format(response.status_code, response.content))
 
-    def write_points_with_time_precision(self, data, time_precision='s'):
+    def write_points_with_precision(self, data, time_precision='s'):
         """
         Write to multiple time series names
         """
@@ -97,42 +102,56 @@ class InfluxDBClient(object):
             raise Exception(
                 "{0}: {1}".format(response.status_code, response.content))
 
-#    # One Time Deletes
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#    def delete_points(self, name,
-#                      regex=None, start_epoch=None, end_epoch=None):
-#        """
-#        TODO: Delete a range of data
-#        """
-#        raise NotImplemented()
-#
-#    # Regularly Scheduled Deletes
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#    def create_scheduled_delete(self, json_body):
-#        """
-#        TODO: Create scheduled delete
-#        """
-#        raise NotImplemented()
-#
-#    # get list of deletes
-#    # curl http://localhost:8086/db/site_dev/scheduled_deletes
-#    #
-#    # remove a regularly scheduled delete
-#    # curl -X DELETE http://localhost:8086/db/site_dev/scheduled_deletes/:id
-#
-#    def get_list_scheduled_delete(self):
-#        """
-#        TODO: Get list of scheduled deletes
-#        """
-#        raise NotImplemented()
-#
-#    def remove_scheduled_delete(self, delete_id):
-#        """
-#        TODO: Remove scheduled delete
-#        """
-#        raise NotImplemented()
+    # One Time Deletes
+
+    # todo
+    def delete_points(self, name,
+                      regex=None, start_epoch=None, end_epoch=None):
+        """
+        Delete a range of data
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
+
+    # Regularly Scheduled Deletes
+
+    # todo
+    def create_scheduled_delete(self, json_body):
+        """
+        Create scheduled delete
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
+
+    # get list of deletes
+    # curl http://localhost:8086/db/site_dev/scheduled_deletes
+    #
+    # remove a regularly scheduled delete
+    # curl -X DELETE http://localhost:8086/db/site_dev/scheduled_deletes/:id
+
+    # todo
+    def get_list_scheduled_delete(self):
+        """
+        Get list of scheduled deletes
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
+
+    # todo
+    def remove_scheduled_delete(self, delete_id):
+        """
+        Remove scheduled delete
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
 
     # Querying Data
     #
@@ -246,11 +265,12 @@ class InfluxDBClient(object):
     #      -d '{"username": "paul", "password": "i write teh docz"}'
 
     # update database admin password
-    # curl -X POST http://localhost:8086/db/site_dev/admins/paul?u=root&p=root \
+    # curl -X POST http://localhost:8086/db/site_dev/admins/paul?u=root&p=root\
     #      -d '{"password": "new pass"}'
 
     # delete database admin
-    # curl -X DELETE http://localhost:8086/db/site_dev/admins/paul?u=root&p=root
+    # curl -X DELETE \
+    #        http://localhost:8086/db/site_dev/admins/paul?u=root&p=root
 
     def get_list_cluster_admins(self):
         """
@@ -358,90 +378,45 @@ class InfluxDBClient(object):
             raise Exception(
                 "{0}: {1}".format(response.status_code, response.content))
 
+    # todo
+    def get_list_database_admins(self):
+        """
+        Get list of database admins
 
-#    # TODO: Not working
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#    def get_list_database_admins(self):
-#        """
-#        Get list of database admins
-#        """
-#        response = requests.get(
-#            "{0}/db/{1}/admins?u={2}&p={3}".format(
-#                self._baseurl,
-#                self._database,
-#                self._username,
-#                self._password))
-#
-#        if response.status_code == 200:
-#            return json.loads(response.content)
-#        else:
-#            raise Exception("{0}: {1}".format(response.status_code, response.content))
-#
-#    # TODO: Not working
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#    def add_database_admin(self, new_username, new_password):
-#        """
-#        Add cluster admin
-#        """
-#        response = requests.post(
-#            "{0}/db/{1}/admins?u={2}&p={3}".format(
-#                self._baseurl,
-#                self._database,
-#                self._username,
-#                self._password),
-#            data=json.dumps({
-#                'username': new_username,
-#                'password': new_password}),
-#            headers=self._headers)
-#
-#        if response.status_code == 200:
-#            return True
-#        else:
-#            raise Exception("{0}: {1}".format(response.status_code, response.content))
-#
-#    # TODO: Not working
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#    def update_database_admin_password(self, username, new_password):
-#        """
-#        Update database admin password
-#        """
-#        response = requests.post(
-#            "{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
-#                self._baseurl,
-#                self._database,
-#                username,
-#                self._username,
-#                self._password),
-#            data=json.dumps({
-#                'password': new_password}),
-#            headers=self._headers)
-#
-#        if response.status_code == 200:
-#            return True
-#        else:
-#            raise Exception("{0}: {1}".format(response.status_code, response.content))
-#
-#    # TODO: Not working
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#    def delete_database_admin(self, username):
-#        """
-#        Delete database admin
-#        """
-#        response = requests.delete("{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
-#            self._baseurl,
-#            self._database,
-#            username,
-#            self._username,
-#            self._password))
-#
-#        if response.status_code == 204:
-#            return True
-#        else:
-#            raise Exception("{0}: {1}".format(response.status_code, response.content))
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
+
+    # todo
+    def add_database_admin(self, new_username, new_password):
+        """
+        Add cluster admin
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
+
+    # todo
+    def update_database_admin_password(self, username, new_password):
+        """
+        Update database admin password
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
+
+    # todo
+    def delete_database_admin(self, username):
+        """
+        Delete database admin
+
+        This endpoint has been not implemented yet in InfluxDB ver0.0.8
+        See also: src/api/http/api.go:l57
+        """
+        raise NotImplementedError()
 
     ###
     # Limiting User Access
@@ -540,12 +515,11 @@ class InfluxDBClient(object):
             raise Exception(
                 "{0}: {1}".format(response.status_code, response.content))
 
-#    # update the user by POSTing to db/site_dev/users/paul
-#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
-#    # see also: src/api/http/api.go:l57)
-#
-#    def update_permission(self, json_body):
-#        """
-#        TODO: Update read/write permission
-#        """
-#        raise NotImplemented()
+    # update the user by POSTing to db/site_dev/users/paul
+
+    # todo
+    def update_permission(self, json_body):
+        """
+        Update read/write permission
+        """
+        raise NotImplementedError()

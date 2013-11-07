@@ -92,24 +92,49 @@ class InfluxDBClient(object):
         else:
             raise Exception("{0}: {1}".format(response.status_code, response.content))
 
-    # TODO:
     # One Time Deletes
 
     def delete_points(self, name,
                       regex=None, start_epoch=None, end_epoch=None):
-        pass
+        """
+        TODO: One Time Deletes
+        """
+        raise NotImplemented()
 
-    # TODO:
     # Regularly Scheduled Deletes
+
+    def create_scheduled_delete(self, json_body):
+        """
+        TODO: Create scheduled delete
+        """
+        raise NotImplemented()
+
     # get list of deletes
     # curl http://localhost:8086/db/site_dev/scheduled_deletes
     #
     # remove a regularly scheduled delete
     # curl -X DELETE http://localhost:8086/db/site_dev/scheduled_deletes/:id
 
-    # TODO:
+    def get_list_scheduled_delete(self):
+        """
+        TODO: Get list of scheduled deletes
+        """
+        raise NotImplemented()
+
+    def remove_scheduled_delete(self, delete_id):
+        """
+        TODO: Remove scheduled delete
+        """
+        raise NotImplemented()
+
     # Querying Data
+    #
     # GET db/:name/series. It takes five parameters
+    def query(self, query, time_precision, chunked=False):
+        """
+        TODO: Quering data
+        """
+        raise NotImplemented()
 
     # Creating and Dropping Databases
     #
@@ -427,4 +452,10 @@ class InfluxDBClient(object):
         else:
             raise Exception("{0}: {1}".format(response.status_code, response.content))
 
-    # TODO: Change read/write permission
+    # update the user by POSTing to db/site_dev/users/paul
+
+    def update_permission(self, json_body):
+        """
+        TODO: Update read/write permission
+        """
+        raise NotImplemented()

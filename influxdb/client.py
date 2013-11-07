@@ -46,11 +46,78 @@ class InfluxDBClient(object):
         self._username = username
         self._password = password
 
-    ###
-    # Administration & Security
+    # Writing Data
+    #
+    # Assuming you have a database named foo_production you can write data
+    # by doing a POST to /db/foo_production/series?u=some_user&p=some_password
+    # with a JSON body of points.
 
-    ###
+    def write_points(self, data):
+        """
+        Write to multiple time series names
+        """
+        response = requests.post(
+            "{0}/db/{1}/series?u={2}&p={3}".format(
+                self._baseurl,
+                self._database,
+                self._username,
+                self._password),
+            data=json.dumps(data),
+            headers=self._headers)
+
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.content)
+
+    def write_points_with_time_precision(self, data, time_precision='s'):
+        """
+        Write to multiple time series names
+        """
+        if time_precision not in ['s', 'm', 'u']:
+            raise Exception("Invalid time precision is given.")
+
+        response = requests.post(
+            "{0}/db/{1}/series?u={2}&p={3}&time_precision={4}".format(
+                self._baseurl,
+                self._database,
+                self._username,
+                self._password,
+                time_precision),
+            data=json.dumps(data),
+            headers=self._headers)
+
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.content)
+
+    # TODO:
+    # One Time Deletes
+
+    def delete_points(self, name,
+                      regex=None, start_epoch=None, end_epoch=None):
+        pass
+
+    # TODO:
+    # Regularly Scheduled Deletes
+    # get list of deletes
+    # curl http://localhost:8086/db/site_dev/scheduled_deletes
+    #
+    # remove a regularly scheduled delete
+    # curl -X DELETE http://localhost:8086/db/site_dev/scheduled_deletes/:id
+
+    # TODO:
+    # Querying Data
+    # GET db/:name/series. It takes five parameters
+
     # Creating and Dropping Databases
+    #
+    # ### create a database
+    # curl -X POST http://localhost:8086/db -d '{"name": "site_development"}'
+    #
+    # ### drop a database
+    # curl -X DELETE http://localhost:8086/db/site_development
 
     def create_database(self, database):
         """
@@ -93,11 +160,193 @@ class InfluxDBClient(object):
         else:
             raise Exception(response.content)
 
-    ###
     # Security
+    # get list of cluster admins
+    # curl http://localhost:8086/cluster_admins?u=root&p=root
+
+    # add cluster admin
+    # curl -X POST http://localhost:8086/cluster_admins?u=root&p=root \
+    #      -d '{"username": "paul", "password": "i write teh docz"}'
+
+    # update cluster admin password
+    # curl -X POST http://localhost:8086/cluster_admins/paul?u=root&p=root \
+    #      -d '{"password": "new pass"}'
+
+    # delete cluster admin
+    # curl -X DELETE http://localhost:8086/cluster_admins/paul?u=root&p=root
+
+    # Database admins, with a database name of site_dev
+    # get list of database admins
+    # curl http://localhost:8086/db/site_dev/admins?u=root&p=root
+
+    # add database admin
+    # curl -X POST http://localhost:8086/db/site_dev/admins?u=root&p=root \
+    #      -d '{"username": "paul", "password": "i write teh docz"}'
+
+    # update database admin password
+    # curl -X POST http://localhost:8086/db/site_dev/admins/paul?u=root&p=root \
+    #      -d '{"password": "new pass"}'
+
+    # delete database admin
+    # curl -X DELETE http://localhost:8086/db/site_dev/admins/paul?u=root&p=root
+
+    def get_list_cluster_admins(self, database):
+        """
+        Get list of cluster admins
+        """
+        response = requests.get(
+            "{0}/cluster_admins?u={1}&p={2}".format(
+                self._baseurl,
+                self._username,
+                self._password))
+
+        if response.status_code == 200:
+            return json.loads(response.content)
+        else:
+            raise Exception(response.content)
+
+    def add_cluster_admin(self, new_username, new_password):
+        """
+        Add cluster admin
+        """
+        response = requests.post(
+            "{0}/cluster_admins?u={1}&p={2}".format(
+                self._baseurl,
+                self._username,
+                self._password),
+            data=json.dumps({
+                'username': new_username,
+                'password': new_password}),
+            headers=self._headers)
+
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.content)
+
+    def update_cluster_admin_password(self, username, new_password):
+        """
+        Update cluster admin password
+        """
+        response = requests.post(
+            "{0}/cluster_admins/{1}?u={2}&p={3}".format(
+                self._baseurl,
+                username,
+                self._username,
+                self._password),
+            data=json.dumps({
+                'password': new_password}),
+            headers=self._headers)
+
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.content)
+
+    def delete_cluster_admin(self, username):
+        """
+        Delete cluster admin
+        """
+        response = requests.delete("{0}/cluster_admin/{1}?u={2}&p={3}".format(
+            self._baseurl,
+            username,
+            self._username,
+            self._password))
+
+        if response.status_code == 204:
+            return True
+        else:
+            raise Exception(response.content)
+
+    def get_list_database_admins(self):
+        """
+        Get list of database admins
+        """
+        response = requests.get(
+            "{0}/db/{1}/admins?u={2}&p={3}".format(
+                self._baseurl,
+                self._database,
+                self._username,
+                self._password))
+
+        if response.status_code == 200:
+            return json.loads(response.content)
+        else:
+            raise Exception(response.content)
+
+    def add_database_admin(self, new_username, new_password):
+        """
+        Add cluster admin
+        """
+        response = requests.post(
+            "{0}/db/{1}/admins?u={2}&p={3}".format(
+                self._baseurl,
+                self._database,
+                self._username,
+                self._password),
+            data=json.dumps({
+                'username': new_username,
+                'password': new_password}),
+            headers=self._headers)
+
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.content)
+
+    def update_database_admin_password(self, username, new_password):
+        """
+        Update database admin password
+        """
+        response = requests.post(
+            "{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
+                self._baseurl,
+                self._database,
+                username,
+                self._username,
+                self._password),
+            data=json.dumps({
+                'password': new_password}),
+            headers=self._headers)
+
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.content)
+
+    def delete_database_admin(self, username):
+        """
+        Delete database admin
+        """
+        response = requests.delete("{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
+            self._baseurl,
+            self._database,
+            username,
+            self._username,
+            self._password))
+
+        if response.status_code == 204:
+            return True
+        else:
+            raise Exception(response.content)
 
     ###
     # Limiting User Access
+
+    # Database users
+    # get list of database users
+    # curl http://localhost:8086/db/site_dev/users?u=root&p=root
+
+    # add database user
+    # curl -X POST http://localhost:8086/db/site_dev/users?u=root&p=root \
+    #       -d '{"username": "paul", "password": "i write teh docz"}'
+
+    # update database user password
+    # curl -X POST http://localhost:8086/db/site_dev/users/paul?u=root&p=root \
+    #       -d '{"password": "new pass"}'
+
+    # delete database user
+    # curl -X DELETE http://localhost:8086/db/site_dev/users/paul?u=root&p=root
 
     def get_database_users(self):
         """
@@ -174,55 +423,4 @@ class InfluxDBClient(object):
         else:
             raise Exception(response.content)
 
-    ###
-    # Writing Data
-
-    def write_points(self, data):
-        """
-        Write to multiple time series names
-        """
-        response = requests.post(
-            "{0}/db/{1}/series?u={2}&p={3}".format(
-                self._baseurl,
-                self._database,
-                self._username,
-                self._password),
-            data=json.dumps(data),
-            headers=self._headers)
-
-        if response.status_code == 200:
-            return True
-        else:
-            raise Exception(response.content)
-
-    def write_points_with_time_precision(self, data, time_precision='s'):
-        """
-        Write to multiple time series names
-        """
-        if time_precision not in ['s', 'm', 'u']:
-            raise Exception("Invalid time precision is given.")
-
-        response = requests.post(
-            "{0}/db/{1}/series?u={2}&p={3}&time_precision={4}".format(
-                self._baseurl,
-                self._database,
-                self._username,
-                self._password,
-                time_precision),
-            data=json.dumps(data),
-            headers=self._headers)
-
-        if response.status_code == 200:
-            return True
-        else:
-            raise Exception(response.content)
-
-    def delete_points(self, name,
-                      regex=None, start_epoch=None, end_epoch=None):
-        pass
-
-    ###
-    # Regularly Scheduled Deletes
-
-    ###
-    # Querying Data
+    # TODO: Change read/write permission

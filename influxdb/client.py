@@ -69,39 +69,61 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def write_points_with_time_precision(self, data, time_precision='s'):
         """
         Write to multiple time series names
         """
         if time_precision not in ['s', 'm', 'u']:
-            raise Exception("Invalid time precision is given. (use 's','m' or 'u')")
+            raise Exception(
+                "Invalid time precision is given. (use 's','m' or 'u')")
 
         url_format = "{0}/db/{1}/series?u={2}&p={3}&time_precision={4}"
 
         response = requests.post(url_format.format(
-                self._baseurl,
-                self._database,
-                self._username,
-                self._password,
-                time_precision),
+            self._baseurl,
+            self._database,
+            self._username,
+            self._password,
+            time_precision),
             data=json.dumps(data),
             headers=self._headers)
 
         if response.status_code == 200:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     # One Time Deletes
 
     def delete_points(self, name,
                       regex=None, start_epoch=None, end_epoch=None):
         """
-        TODO: One Time Deletes
+        Delete a range of data
         """
-        raise NotImplemented()
+        url_format = "{0}/db/{1}/series?u={2}&p={3}"
+        url_format += "&name={4}"
+        if regex is not None:
+            url_format += "&regex=" + regex
+        if start_epoch is not None:
+            url_format += "&start=" + start_epoch
+        if end_epoch is not None:
+            url_format += "&end=" + end_epoch
+
+        response = requests.delete(url_format.format(
+            self._baseurl,
+            self._database,
+            self._username,
+            self._password,
+            name))
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     # Regularly Scheduled Deletes
 
@@ -137,7 +159,8 @@ class InfluxDBClient(object):
         Quering data
         """
         if time_precision not in ['s', 'm', 'u']:
-            raise Exception("Invalid time precision is given. (use 's','m' or 'u')")
+            raise Exception(
+                "Invalid time precision is given. (use 's','m' or 'u')")
 
         if chunked is True:
             chunked_param = 'true'
@@ -162,7 +185,8 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return response.content
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     # Creating and Dropping Databases
     #
@@ -211,7 +235,8 @@ class InfluxDBClient(object):
         if response.status_code == 204:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     # Security
     # get list of cluster admins
@@ -256,7 +281,8 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return json.loads(response.content)
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def add_cluster_admin(self, new_username, new_password):
         """
@@ -275,7 +301,8 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def update_cluster_admin_password(self, username, new_password):
         """

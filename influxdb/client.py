@@ -97,59 +97,42 @@ class InfluxDBClient(object):
             raise Exception(
                 "{0}: {1}".format(response.status_code, response.content))
 
-    # One Time Deletes
-
-    def delete_points(self, name,
-                      regex=None, start_epoch=None, end_epoch=None):
-        """
-        Delete a range of data
-        """
-        url_format = "{0}/db/{1}/series?u={2}&p={3}"
-        url_format += "&name={4}"
-        if regex is not None:
-            url_format += "&regex=" + regex
-        if start_epoch is not None:
-            url_format += "&start=" + start_epoch
-        if end_epoch is not None:
-            url_format += "&end=" + end_epoch
-
-        response = requests.delete(url_format.format(
-            self._baseurl,
-            self._database,
-            self._username,
-            self._password,
-            name))
-        if response.status_code == 200:
-            return True
-        else:
-            raise Exception(
-                "{0}: {1}".format(response.status_code, response.content))
-
-    # Regularly Scheduled Deletes
-
-    def create_scheduled_delete(self, json_body):
-        """
-        TODO: Create scheduled delete
-        """
-        raise NotImplemented()
-
-    # get list of deletes
-    # curl http://localhost:8086/db/site_dev/scheduled_deletes
-    #
-    # remove a regularly scheduled delete
-    # curl -X DELETE http://localhost:8086/db/site_dev/scheduled_deletes/:id
-
-    def get_list_scheduled_delete(self):
-        """
-        TODO: Get list of scheduled deletes
-        """
-        raise NotImplemented()
-
-    def remove_scheduled_delete(self, delete_id):
-        """
-        TODO: Remove scheduled delete
-        """
-        raise NotImplemented()
+#    # One Time Deletes
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
+#    def delete_points(self, name,
+#                      regex=None, start_epoch=None, end_epoch=None):
+#        """
+#        TODO: Delete a range of data
+#        """
+#        raise NotImplemented()
+#
+#    # Regularly Scheduled Deletes
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
+#    def create_scheduled_delete(self, json_body):
+#        """
+#        TODO: Create scheduled delete
+#        """
+#        raise NotImplemented()
+#
+#    # get list of deletes
+#    # curl http://localhost:8086/db/site_dev/scheduled_deletes
+#    #
+#    # remove a regularly scheduled delete
+#    # curl -X DELETE http://localhost:8086/db/site_dev/scheduled_deletes/:id
+#
+#    def get_list_scheduled_delete(self):
+#        """
+#        TODO: Get list of scheduled deletes
+#        """
+#        raise NotImplemented()
+#
+#    def remove_scheduled_delete(self, delete_id):
+#        """
+#        TODO: Remove scheduled delete
+#        """
+#        raise NotImplemented()
 
     # Querying Data
     #
@@ -215,7 +198,8 @@ class InfluxDBClient(object):
         if response.status_code == 201:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def delete_database(self, database):
         """
@@ -321,7 +305,8 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def delete_cluster_admin(self, username):
         """
@@ -336,50 +321,12 @@ class InfluxDBClient(object):
         if response.status_code == 204:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
-    # TODO: Not working
-    def get_list_database_admins(self):
+    def set_database_admin(self, username):
         """
-        Get list of database admins
-        """
-        response = requests.get(
-            "{0}/db/{1}/admins?u={2}&p={3}".format(
-                self._baseurl,
-                self._database,
-                self._username,
-                self._password))
-
-        if response.status_code == 200:
-            return json.loads(response.content)
-        else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
-
-    # TODO: Not working
-    def add_database_admin(self, new_username, new_password):
-        """
-        Add cluster admin
-        """
-        response = requests.post(
-            "{0}/db/{1}/admins?u={2}&p={3}".format(
-                self._baseurl,
-                self._database,
-                self._username,
-                self._password),
-            data=json.dumps({
-                'username': new_username,
-                'password': new_password}),
-            headers=self._headers)
-
-        if response.status_code == 200:
-            return True
-        else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
-
-    # TODO: Not working
-    def update_database_admin_password(self, username, new_password):
-        """
-        Update database admin password
+        Set user as database admin
         """
         response = requests.post(
             "{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
@@ -387,32 +334,114 @@ class InfluxDBClient(object):
                 self._database,
                 username,
                 self._username,
-                self._password),
-            data=json.dumps({
-                'password': new_password}),
-            headers=self._headers)
-
-        if response.status_code == 200:
-            return True
-        else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
-
-    # TODO: Not working
-    def delete_database_admin(self, username):
-        """
-        Delete database admin
-        """
-        response = requests.delete("{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
-            self._baseurl,
-            self._database,
-            username,
-            self._username,
-            self._password))
-
+                self._password))
         if response.status_code == 204:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
+
+    def unset_database_admin(self, username):
+        """
+        Unset user as database admin
+        """
+        response = requests.delete(
+            "{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
+                self._baseurl,
+                self._database,
+                username,
+                self._username,
+                self._password))
+        if response.status_code == 204:
+            return True
+        else:
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
+
+
+#    # TODO: Not working
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
+#    def get_list_database_admins(self):
+#        """
+#        Get list of database admins
+#        """
+#        response = requests.get(
+#            "{0}/db/{1}/admins?u={2}&p={3}".format(
+#                self._baseurl,
+#                self._database,
+#                self._username,
+#                self._password))
+#
+#        if response.status_code == 200:
+#            return json.loads(response.content)
+#        else:
+#            raise Exception("{0}: {1}".format(response.status_code, response.content))
+#
+#    # TODO: Not working
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
+#    def add_database_admin(self, new_username, new_password):
+#        """
+#        Add cluster admin
+#        """
+#        response = requests.post(
+#            "{0}/db/{1}/admins?u={2}&p={3}".format(
+#                self._baseurl,
+#                self._database,
+#                self._username,
+#                self._password),
+#            data=json.dumps({
+#                'username': new_username,
+#                'password': new_password}),
+#            headers=self._headers)
+#
+#        if response.status_code == 200:
+#            return True
+#        else:
+#            raise Exception("{0}: {1}".format(response.status_code, response.content))
+#
+#    # TODO: Not working
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
+#    def update_database_admin_password(self, username, new_password):
+#        """
+#        Update database admin password
+#        """
+#        response = requests.post(
+#            "{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
+#                self._baseurl,
+#                self._database,
+#                username,
+#                self._username,
+#                self._password),
+#            data=json.dumps({
+#                'password': new_password}),
+#            headers=self._headers)
+#
+#        if response.status_code == 200:
+#            return True
+#        else:
+#            raise Exception("{0}: {1}".format(response.status_code, response.content))
+#
+#    # TODO: Not working
+#    # (I guess this endpoint is not implemented in InfluxDB v0.0.7
+#    # see also: src/api/http/api.go:l57)
+#    def delete_database_admin(self, username):
+#        """
+#        Delete database admin
+#        """
+#        response = requests.delete("{0}/db/{1}/admins/{2}?u={3}&p={4}".format(
+#            self._baseurl,
+#            self._database,
+#            username,
+#            self._username,
+#            self._password))
+#
+#        if response.status_code == 204:
+#            return True
+#        else:
+#            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     ###
     # Limiting User Access
@@ -446,7 +475,8 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return json.loads(response.content)
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def add_database_user(self, new_username, new_password):
         """
@@ -466,7 +496,8 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def update_database_user_password(self, username, new_password):
         """
@@ -488,7 +519,8 @@ class InfluxDBClient(object):
                 self._password = new_password
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
     def delete_database_user(self, username):
         """
@@ -505,12 +537,13 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception("{0}: {1}".format(response.status_code, response.content))
+            raise Exception(
+                "{0}: {1}".format(response.status_code, response.content))
 
-    # update the user by POSTing to db/site_dev/users/paul
-
-    def update_permission(self, json_body):
-        """
-        TODO: Update read/write permission
-        """
-        raise NotImplemented()
+#    # update the user by POSTing to db/site_dev/users/paul
+#
+#    def update_permission(self, json_body):
+#        """
+#        TODO: Update read/write permission
+#        """
+#        raise NotImplemented()

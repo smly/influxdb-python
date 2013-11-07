@@ -68,7 +68,7 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def write_points_with_time_precision(self, data, time_precision='s'):
         """
@@ -90,7 +90,7 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     # TODO:
     # One Time Deletes
@@ -138,7 +138,7 @@ class InfluxDBClient(object):
         if response.status_code == 201:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def delete_database(self, database):
         """
@@ -158,7 +158,7 @@ class InfluxDBClient(object):
         if response.status_code == 204:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     # Security
     # get list of cluster admins
@@ -190,7 +190,7 @@ class InfluxDBClient(object):
     # delete database admin
     # curl -X DELETE http://localhost:8086/db/site_dev/admins/paul?u=root&p=root
 
-    def get_list_cluster_admins(self, database):
+    def get_list_cluster_admins(self):
         """
         Get list of cluster admins
         """
@@ -203,7 +203,7 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return json.loads(response.content)
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def add_cluster_admin(self, new_username, new_password):
         """
@@ -222,7 +222,7 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def update_cluster_admin_password(self, username, new_password):
         """
@@ -241,13 +241,13 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def delete_cluster_admin(self, username):
         """
         Delete cluster admin
         """
-        response = requests.delete("{0}/cluster_admin/{1}?u={2}&p={3}".format(
+        response = requests.delete("{0}/cluster_admins/{1}?u={2}&p={3}".format(
             self._baseurl,
             username,
             self._username,
@@ -256,8 +256,9 @@ class InfluxDBClient(object):
         if response.status_code == 204:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
+    # TODO: Not working
     def get_list_database_admins(self):
         """
         Get list of database admins
@@ -272,8 +273,9 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return json.loads(response.content)
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
+    # TODO: Not working
     def add_database_admin(self, new_username, new_password):
         """
         Add cluster admin
@@ -292,8 +294,9 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
+    # TODO: Not working
     def update_database_admin_password(self, username, new_password):
         """
         Update database admin password
@@ -312,8 +315,9 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
+    # TODO: Not working
     def delete_database_admin(self, username):
         """
         Delete database admin
@@ -328,7 +332,7 @@ class InfluxDBClient(object):
         if response.status_code == 204:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     ###
     # Limiting User Access
@@ -362,7 +366,7 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return json.loads(response.content)
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def add_database_user(self, new_username, new_password):
         """
@@ -382,9 +386,9 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
-    def update_database_password(self, username, new_password):
+    def update_database_user_password(self, username, new_password):
         """
         Update password
         """
@@ -404,7 +408,7 @@ class InfluxDBClient(object):
                 self._password = new_password
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     def delete_database_user(self, username):
         """
@@ -421,6 +425,6 @@ class InfluxDBClient(object):
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.content)
+            raise Exception("{0}: {1}".format(response.status_code, response.content))
 
     # TODO: Change read/write permission

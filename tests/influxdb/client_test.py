@@ -27,7 +27,7 @@ class TestInfluxDBClient(object):
 
     def test_create_database(self):
         with patch.object(requests, 'post') as mocked_post:
-            mocked_post.return_value = _build_response_object()
+            mocked_post.return_value = _build_response_object(status_code=201)
             cli = InfluxDBClient('host', 8086, 'username', 'password', 'db')
             assert cli.create_database('new_db') is True
 
@@ -40,7 +40,7 @@ class TestInfluxDBClient(object):
 
     def test_delete_database(self):
         with patch.object(requests, 'delete') as mocked_post:
-            mocked_post.return_value = _build_response_object()
+            mocked_post.return_value = _build_response_object(status_code=204)
             cli = InfluxDBClient('host', 8086, 'username', 'password', 'db')
             assert cli.delete_database('old_db') is True
 

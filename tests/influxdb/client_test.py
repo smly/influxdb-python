@@ -108,6 +108,13 @@ class TestInfluxDBClient(object):
             result = cli.query('select column_one from foo;')
             assert len(json.loads(result)[0]['points']) == 4
 
+    @raises(Exception)
+    def test_query_fail(self):
+        with patch.object(requests, 'get') as mocked_get:
+            mocked_get.return_value = _build_response_object(status_code=401)
+            cli = InfluxDBClient('host', 8086, 'username', 'password', 'db')
+            cli.query('select column_one from foo;')
+
     def test_create_database(self):
         with patch.object(requests, 'post') as mocked_post:
             mocked_post.return_value = _build_response_object(status_code=201)

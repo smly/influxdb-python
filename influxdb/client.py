@@ -518,7 +518,7 @@ class InfluxDBClient(object):
     # update the user by POSTing to db/site_dev/users/paul
 
     # todo
-    def update_permission(self, json_body):
+    def update_permission(self, username, json_body):
         """
         Update read/write permission
         """

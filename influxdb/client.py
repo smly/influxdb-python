@@ -3,7 +3,8 @@
 python client for influxdb
 """
 import json
-import urllib
+
+from six.moves.urllib.parse import urlencode
 
 import requests
 
@@ -169,7 +170,7 @@ class InfluxDBClient(object):
         else:
             chunked_param = 'false'
 
-        encoded_query = urllib.urlencode({
+        encoded_query = urlencode({
             'q': query})
 
         url_format = "{0}/db/{1}/series?{2}&u={3}&p={4}"

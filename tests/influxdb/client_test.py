@@ -2,6 +2,8 @@
 """
 unit tests
 """
+import json
+
 import requests
 from nose.tools import raises
 from mock import patch
@@ -97,7 +99,14 @@ class TestInfluxDBClient(object):
         cli.remove_scheduled_delete(1)
 
     def test_query(self):
-        pass
+        expected = """[{"name":"foo","columns":["time","sequence_number","column_one"],"points":[[1383876043,16,"2"],[1383876043,15,"1"],[1383876035,14,"2"],[1383876035,13,"1"]]}]"""
+        with patch.object(requests, 'get') as mocked_get:
+            mocked_get.return_value = _build_response_object(
+                status_code=200,
+                content=expected)
+            cli = InfluxDBClient('host', 8086, 'username', 'password', 'db')
+            result = cli.query('select column_one from foo;')
+            assert len(json.loads(result)[0]['points']) == 4
 
     def test_create_database(self):
         with patch.object(requests, 'post') as mocked_post:
